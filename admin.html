@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tee Shirt Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="admin">
+  <div id="loginScreen" class="login-screen">
+    <form id="adminLoginForm" class="login-card">
+      <span class="brand-mark">TS</span>
+      <h1>Tee Shirt Admin</h1>
+      <p class="muted">Default password: <b>admin123</b></p>
+      <input id="adminPassword" type="password" placeholder="Admin password" required />
+      <button class="primary-btn" type="submit">Login</button>
+      <a href="index.html">Back to customer page</a>
+    </form>
+  </div>
+
+  <div id="adminApp" class="admin-layout hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><span class="brand-mark">TS</span><b>Tee Admin</b></div>
+      <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
+      <button class="admin-tab" data-tab="products">Products</button>
+      <button class="admin-tab" data-tab="stock">Stock Monitoring</button>
+      <button class="admin-tab" data-tab="pos">POS</button>
+      <button class="admin-tab" data-tab="orders">Orders</button>
+      <button class="admin-tab" data-tab="messages">Messages</button>
+      <button class="admin-tab" data-tab="settings">Settings</button>
+      <a class="admin-link" href="index.html">Customer Page</a>
+      <button id="logoutAdmin" class="danger-btn">Logout</button>
+    </aside>
+
+    <main class="admin-main">
+      <section id="dashboard" class="admin-section active">
+        <h1>Dashboard</h1>
+        <div class="stats-grid">
+          <div class="stat-card"><span>Sales Today</span><b id="salesToday">₱0</b></div>
+          <div class="stat-card"><span>Total Orders</span><b id="totalOrders">0</b></div>
+          <div class="stat-card"><span>Total Products</span><b id="totalProducts">0</b></div>
+          <div class="stat-card warning"><span>Low Stock</span><b id="lowStockCount">0</b></div>
+        </div>
+        <div class="panel"><h2>Recent Orders</h2><div id="recentOrders"></div></div>
+      </section>
+
+      <section id="products" class="admin-section">
+        <div class="section-head"><h1>Products</h1><button id="resetDemo" class="secondary-btn">Reset Demo Data</button></div>
+        <form id="productForm" class="panel product-form">
+          <input name="id" type="hidden" />
+          <input required name="name" placeholder="Product name" />
+          <input required name="category" placeholder="Category e.g. Custom, Oversized" />
+          <input required name="price" type="number" placeholder="Price" />
+          <input required name="stock" type="number" placeholder="Stock" />
+          <input required name="size" placeholder="Sizes e.g. S,M,L,XL" />
+          <input required name="color" placeholder="Colors e.g. Black,White" />
+          <input name="image" placeholder="Image URL or leave blank" />
+          <textarea name="description" placeholder="Description"></textarea>
+          <button class="primary-btn" type="submit">Save Product</button>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Size/Color</th><th>Actions</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+      </section>
+
+      <section id="stock" class="admin-section">
+        <h1>Stock Monitoring</h1>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Stock</th><th>Status</th><th>Quick Update</th></tr></thead><tbody id="stockTable"></tbody></table></div>
+      </section>
+
+      <section id="pos" class="admin-section">
+        <h1>POS</h1>
+        <div class="pos-grid">
+          <div class="panel"><input id="posSearch" placeholder="Search product for walk-in sale..." /><div id="posProducts" class="pos-products"></div></div>
+          <div class="panel"><h2>Current Sale</h2><div id="posCart"></div><div class="summary-row total"><span>Total</span><b id="posTotal">₱0</b></div><button id="completeSale" class="primary-btn full">Complete POS Sale</button><button id="clearSale" class="secondary-btn full">Clear</button></div>
+        </div>
+      </section>
+
+      <section id="orders" class="admin-section">
+        <h1>Orders</h1>
+        <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+      </section>
+
+      <section id="messages" class="admin-section">
+        <h1>Messages / Custom Requests</h1>
+        <div id="messagesList" class="message-list"></div>
+      </section>
+
+      <section id="settings" class="admin-section">
+        <h1>Settings</h1>
+        <form id="settingsForm" class="panel form-grid">
+          <input name="shopName" placeholder="Shop name" />
+          <input name="shipping" type="number" placeholder="Shipping fee" />
+          <input name="password" placeholder="New admin password" />
+          <button class="primary-btn" type="submit">Save Settings</button>
+        </form>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+</body>
+</html>
