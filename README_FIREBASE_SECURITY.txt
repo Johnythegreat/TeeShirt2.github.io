@@ -1,33 +1,27 @@
-# Tee Shirt Firebase Secure Setup
+# Tee Shirt Firebase Secure Admin Build
 
-Your Firebase config is already merged.
+Fixed:
+- Frontend now uses your uploaded logo image from assets/tshirt-logo.jpg
+- Admin login now uses Firebase Authentication email + password
+- Old admin123 login removed
+- Admin access is checked using Firestore collection: admins/{uid}
 
-## Admin security setup
+## How to make your email an admin
 
-1. Go to Firebase Console > Authentication.
-2. Open your admin email user.
-3. Copy the UID.
-4. Go to Firestore Database.
-5. Create collection: admins
-6. Create document ID using your copied UID.
-7. Add these fields:
+1. Firebase Console > Authentication
+2. Click your admin email user
+3. Copy the UID
+4. Firestore Database > Start collection
+5. Collection ID: admins
+6. Document ID: paste the copied UID
+7. Add fields:
+   - role = admin
+   - email = your admin email
 
-role = admin
-email = youradminemail@gmail.com
+## Publish rules
 
-Only users listed inside the admins collection can edit products, POS, inventory, sales, promos, and admin-only records.
+Copy firestore.rules to Firestore Rules.
+Copy storage.rules to Storage Rules.
 
-## Firestore Rules
-
-Copy the content of firestore.rules into:
-Firebase Console > Firestore Database > Rules > Publish
-
-## Storage Rules
-
-Copy the content of storage.rules into:
-Firebase Console > Storage > Rules > Publish
-
-## Important
-
-Do not use allow read, write: if true for live business websites.
-That is only for testing.
+Important:
+If your UID is not inside admins collection, login will be blocked even if the email/password is correct.
