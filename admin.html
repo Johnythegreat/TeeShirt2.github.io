@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T-Trend Staff Admin Portal | Real-time POS Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .serif-title {
+      font-family: 'Playfair Display', serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 flex flex-col min-h-screen">
+
+  <!-- TOP BRAND STRIP -->
+  <div class="bg-black text-white text-xs py-2 px-6 flex justify-between items-center z-50">
+    <div class="flex items-center gap-1.5 flex-nowrap font-medium text-gray-300">
+      <i class="fa-solid fa-lock text-yellow-400"></i> SECURED FIREBASE SESSION INTERFACE
+    </div>
+    <div class="font-extrabold text-teal-400 select-none animate-pulse">
+      ● ADMIN / TERMINAL STATION
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="hover:text-amber-400 font-semibold text-xs border border-teal-500/50 px-2.5 py-0.5 rounded transition"><i class="fa-solid fa-store mr-1"></i> Storefront</a>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATOR ENHANCED COVER LAYER -->
+  <div id="admin-auth-placeholder" class="fixed inset-y-0 inset-x-0 bg-neutral-950 flex flex-col items-center justify-center p-6 z-40 hidden">
+    <div class="bg-white p-8 sm:p-10 rounded-3xl max-w-md w-full shadow-2xl border flex flex-col items-center text-center space-y-6">
+      
+      <div class="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 text-3xl border border-amber-500/20">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+
+      <div>
+        <h2 class="serif-title text-2xl font-bold uppercase tracking-tight text-neutral-900">Protected Workspace</h2>
+        <p class="text-xs text-gray-400 mt-1.5 leading-relaxed">Authorized fashion administrators are requested to proceed with staff security validation to sync live Inventory control & real-time POS terminals.</p>
+      </div>
+
+      <button id="admin-bypass-login-btn" class="w-full bg-black hover:bg-neutral-800 text-white font-bold uppercase text-xs py-4 rounded-xl tracking-wider transition shadow-lg flex justify-center items-center gap-2">
+        Validate Admin System Identity <i class="fa-solid fa-right-to-bracket text-[13px]"></i>
+      </button>
+
+      <a href="index.html" class="text-xs text-gray-400 hover:text-black hover:underline transition">Return back to Storefront Hub</a>
+    </div>
+  </div>
+
+  <!-- MAIN ADMIN CONTAINER WRAP-->
+  <div class="flex-grow flex flex-col" id="admin-main-interface">
+    
+    <!-- NAVIGATION BAR -->
+    <header class="bg-white border-b sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        
+        <!-- Logo -->
+        <a href="#" class="flex flex-col select-none">
+          <span class="text-2xl font-black tracking-tighter text-black uppercase">T-TREND</span>
+          <span class="text-[8px] tracking-[0.4em] font-semibold text-teal-600 uppercase -mt-0.5 block text-right">STAFF LOGISTICS</span>
+        </a>
+
+        <!-- System state display -->
+        <div class="hidden sm:flex items-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Firestore Realtime Stream</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-gray-500 hover:text-rose-500 cursor-pointer transition select-none" id="active-staff-email">admin@ttrend.com</span>
+            <button id="admin-logout-btn" class="text-xs font-black bg-stone-100 hover:bg-rose-500 hover:text-white px-2 py-0.8 rounded text-stone-600 transition"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ADMIN WORKSPACE GRID -->
+    <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-grow grid grid-cols-1 xl:grid-cols-3 gap-8">
+      
+      <!-- LEFT MODULE: INVENTORY & STOCK CONTROL -->
+      <section class="xl:col-span-2 space-y-6">
+        
+        <!-- MODULE HEADER WITH CREATE TRIGGER -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h2 class="serif-title text-2xl font-bold uppercase tracking-tight text-neutral-900 flex items-center gap-2">
+              <i class="fa-solid fa-boxes-packing text-teal-500 text-xl"></i> Inventory Control
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">Add, update variations, restock sizing indices, and synchronize models.</p>
+          </div>
+          <button id="open-product-modal-btn" class="bg-black hover:bg-teal-600 text-white font-bold text-xs uppercase px-4 py-3 rounded-xl tracking-wider shadow transition-all flex items-center gap-1.5">
+            Add Wardrobe Item <i class="fa-solid fa-circle-plus text-base"></i>
+          </button>
+        </div>
+
+        <!-- PRODUCTS STREAM DISPLAY TABLE -->
+        <div class="bg-white rounded-2xl border shadow-sm overflow-hidden whitespace-normal">
+          <table class="w-full text-left border-collapse table-auto">
+            <thead class="bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-[#7c8291] select-none border-b">
+              <tr>
+                <th class="py-4 px-6">Product</th>
+                <th class="py-4 px-3">Price</th>
+                <th class="py-4 px-3">Category</th>
+                <th class="py-4 px-6 text-center">Size Stock levels</th>
+                <th class="py-4 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody" class="text-sm font-semibold divide-y">
+              <!-- Dynamically populated via product stream snapshots -->
+              <tr>
+                <td colspan="5" class="py-12 text-center text-gray-500">
+                  <div class="animate-spin text-teal-500 text-3xl mb-3"><i class="fa-solid fa-spinner"></i></div>
+                  <p class="text-xs font-semibold">Streaming real-time Firestore database inventory...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- RIGHT SIDE: POINT OF SALE & ORDERS CONTROL -->
+      <section class="space-y-6">
+        
+        <!-- LIVE SALES HIGHLIGHT STATS CARD -->
+        <div class="bg-gradient-to-br from-neutral-900 to-stone-900 text-white p-6 rounded-2xl shadow-lg border relative overflow-hidden flex flex-col justify-between min-h-[148px]">
+          <div class="absolute right-0 bottom-0 w-32 h-32 bg-teal-500/10 blur-2xl rounded-full"></div>
+          
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-bold uppercase text-teal-400 tracking-widest leading-none">Logistics Ledger</span>
+            <span id="current-date-badge" class="text-[9px] bg-white/10 px-2 py-0.5 rounded font-mono">1445-2026</span>
+          </div>
+
+          <div class="mt-4">
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-brand">Combined Gross Turnovers</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span class="text-3xl font-black tracking-tight" id="gross-revenue-display">$0.00</span>
+              <span class="text-xs text-green-400 font-semibold" id="orders-count-indicator">0 Orders</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- POS TERMINAL ORDER MANAGERS -->
+        <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col h-[560px]">
+          <div class="flex justify-between items-center pb-4 border-b">
+            <div>
+              <h3 class="font-bold text-base uppercase tracking-tight flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-amber-500"></i> Dispatch Order Terminal</h3>
+              <p class="text-[10px] text-gray-400 leading-none mt-1">Manage processing codes with instant state changes.</p>
+            </div>
+          </div>
+
+          <!-- Real-time orders listing -->
+          <div class="flex-1 overflow-y-auto space-y-3.5 pr-1 mt-4" id="admin-orders-container">
+            <!-- Dynamically populated -->
+            <p class="text-xs text-gray-400 italic text-center py-20">Awaiting database streaming...</p>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ADD / EDIT WARDROBE DEPOSIT MODAL -->
+  <div id="product-actions-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 hidden">
+    <div class="relative bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden my-8">
+      
+      <!-- Modal head -->
+      <div class="bg-neutral-900 text-white px-6 py-4 flex justify-between items-center">
+        <h3 class="text-base font-bold uppercase tracking-tight" id="modal-action-title">Create New Wardrobe Item</h3>
+        <button id="close-product-actions-modal" class="text-gray-400 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Action Form -->
+      <form id="product-build-form" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <!-- Hidden product ID storage -->
+        <input type="hidden" id="edit-prod-id" />
+
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Product Title</label>
+          <input type="text" id="prod-title" required placeholder="e.g. Cyberpunk Grid Dream Heavy Oversized T-Shirt" class="w-full border rounded px-3 py-2 text-sm outline-none focus:border-stone-900" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Market Category</label>
+            <select id="prod-category" required class="w-full border rounded px-3 py-2 text-sm outline-none bg-white focus:border-stone-900 font-semibold">
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="vintage">Vintage / Retro</option>
+              <option value="minimalist">Minimalist</option>
+              <option value="heavyweight">Heavyweight Cotton</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Catalog Pricing ($ USD)</label>
+            <input type="number" step="0.01" id="prod-price" required placeholder="e.g. 19.99" class="w-full border rounded px-3 py-2 text-sm outline-none focus:border-stone-900 font-mono font-bold" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Poster Image URL</label>
+          <div class="flex gap-2">
+            <input type="url" id="prod-image" required placeholder="Paste unsplash or host graphic image link..." class="flex-1 border rounded px-3 py-2 text-xs outline-none focus:border-stone-900" />
+            <button type="button" id="random-image-btn" class="bg-gray-100 hover:bg-stone-200 border text-black font-semibold text-xs px-2.5 rounded transition shadow-none"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto Gen</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Accent Graphic Color Combos (Comma Separated)</label>
+          <input type="text" id="prod-colors" required placeholder="e.g. Black, White, Soft Sage" class="w-full border rounded px-3 py-2 text-sm outline-none focus:border-stone-900" />
+        </div>
+
+        <div class="border-t pt-4">
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Configure Sizing Inventory Stocks</label>
+          <div class="grid grid-cols-4 gap-3">
+            <div>
+              <label class="block text-center text-xs font-semibold text-gray-400 uppercase mb-1">Size S</label>
+              <input type="number" id="stock-s" required min="0" value="10" class="w-full border rounded text-center py-1.5 font-bold font-mono outline-none focus:border-stone-900" />
+            </div>
+            <div>
+              <label class="block text-center text-xs font-semibold text-gray-400 uppercase mb-1">Size M</label>
+              <input type="number" id="stock-m" required min="0" value="15" class="w-full border rounded text-center py-1.5 font-bold font-mono outline-none focus:border-stone-900" />
+            </div>
+            <div>
+              <label class="block text-center text-xs font-semibold text-gray-400 uppercase mb-1">Size L</label>
+              <input type="number" id="stock-l" required min="0" value="10" class="w-full border rounded text-center py-1.5 font-bold font-mono outline-none focus:border-stone-900" />
+            </div>
+            <div>
+              <label class="block text-center text-xs font-semibold text-gray-400 uppercase mb-1">Size XL</label>
+              <input type="number" id="stock-xl" required min="0" value="5" class="w-full border rounded text-center py-1.5 font-bold font-mono outline-none focus:border-stone-900" />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Production Description</label>
+          <textarea id="prod-description" required rows="3" placeholder="Describe fabric quality, cotton weight (GSM), and art style parameters..." class="w-full border rounded px-3 py-2 text-xs outline-none focus:border-stone-900 leading-relaxed"></textarea>
+        </div>
+
+        <div class="border-t pt-4 flex gap-3">
+          <button type="button" id="delete-prod-btn" class="bg-rose-100 hover:bg-rose-500 text-rose-600 hover:text-white border border-rose-200 uppercase tracking-wider font-extrabold px-4 py-3 rounded-xl text-xs transition hidden"><i class="fa-solid fa-trash-can"></i></button>
+          <button type="submit" id="submit-prod-form-btn" class="flex-1 bg-black hover:bg-teal-600 text-white uppercase tracking-wider font-extrabold py-3.5 rounded-xl text-xs transition">Save Inventory Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION CONTAINER (Auto pop-up toasts) -->
+  <div id="toast-wrapper" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm pointer-events-none"></div>
+
+  <!-- Firebase integration script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      getDocs, 
+      getDoc, 
+      addDoc, 
+      setDoc, 
+      updateDoc, 
+      deleteDoc, 
+      query, 
+      where, 
+      orderBy, 
+      onSnapshot, 
+      runTransaction 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Same Firebase connection config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYE1h4hmU8ppSa18Jz-veC6GADBgsIa3g",
+      authDomain: "tee-shirt-2.firebaseapp.com",
+      projectId: "tee-shirt-2",
+      storageBucket: "tee-shirt-2.firebasestorage.app",
+      messagingSenderId: "795409975965",
+      appId: "1:795409975965:web:679a7672811d748677e274",
+      measurementId: "G-QY4MJ62VFZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let activeAdminUser = null;
+    let productsList = [];
+    let ordersList = [];
+
+    // On Load triggers
+    window.addEventListener('DOMContentLoaded', () => {
+      startAdminSessionTracker();
+      setAdminListeners();
+    });
+
+    // Trace Admin Authentication Profile Access
+    function startAdminSessionTracker() {
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === "admin@ttrend.com") {
+          activeAdminUser = user;
+          document.getElementById('active-staff-email').innerText = user.email;
+          document.getElementById('admin-auth-placeholder').classList.add('hidden');
+          
+          // Hydrate Live streams safely
+          streamRealtimeProducts();
+          streamRealtimeOrders();
+        } else {
+          activeAdminUser = null;
+          document.getElementById('admin-auth-placeholder').classList.remove('hidden');
+        }
+      });
+    }
+
+    // Set Listeners
+    function setAdminListeners() {
+      // Validate identity bypass trigger
+      document.getElementById('admin-bypass-login-btn').addEventListener('click', async () => {
+        try {
+          await signInWithEmailAndPassword(auth, "admin@ttrend.com", "admin12345");
+          showToast("Admin session approved comfortable!", "success");
+        } catch (err) {
+          showToast("Authentication Error. Seed credential default admin first.", "error");
+        }
+      });
+
+      // Admin manual logout
+      document.getElementById('admin-logout-btn').addEventListener('click', handleAdminSignout);
+
+      // Open blank Create Modal
+      document.getElementById('open-product-modal-btn').addEventListener('click', () => {
+        clearFormAndSetAction("create");
+        document.getElementById('product-actions-modal').classList.remove('hidden');
+      });
+
+      // Close Product Actions modal
+      document.getElementById('close-product-actions-modal').addEventListener('click', () => {
+        document.getElementById('product-actions-modal').classList.add('hidden');
+      });
+
+      // Form submittals interceptor (Create or Patch database items)
+      document.getElementById('product-build-form').addEventListener('submit', handleProductFormSubmit);
+
+      // Delete Product asset btn trigger
+      document.getElementById('delete-prod-btn').addEventListener('click', handleProductDeleteAction);
+
+      // Image generator helper action
+      document.getElementById('random-image-btn').addEventListener('click', () => {
+        const keyword = document.getElementById('prod-category').value || 'fashion';
+        const randomIndex = Math.floor(Math.random() * 1000);
+        const autoUrl = `https://images.unsplash.com/photo-${randomIndex === 500 ? '155690555-8f358a7a47b2' : '1578587018452-892bacefd3f2'}?q=80&w=600&auto=format&fit=crop`;
+        
+        let customVal = `https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=600&auto=format&fit=crop`;
+        if (keyword === 'cyberpunk') {
+          customVal = `https://images.unsplash.com/photo-1578587018452-892bacefd3f2?q=80&w=600&auto=format&fit=crop`;
+        } else if (keyword === 'vintage') {
+          customVal = `https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600&auto=format&fit=crop`;
+        } else if (keyword === 'minimalist') {
+          customVal = `https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600&auto=format&fit=crop`;
+        } else if (keyword === 'heavyweight') {
+          customVal = `https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=600&auto=format&fit=crop`;
+        }
+
+        document.getElementById('prod-image').value = customVal;
+        showToast("Auto selected matching aesthetic canvas", "info");
+      });
+    }
+
+    async function handleAdminSignout() {
+      try {
+        await signOut(auth);
+        showToast("Logged out from Staff Area safely.", "info");
+      } catch (err) {
+        showToast("Signout error", "error");
+      }
+    }
+
+    // Realtime stream products inventory
+    function streamRealtimeProducts() {
+      const prodCollection = collection(db, "products");
+      
+      onSnapshot(prodCollection, (snapshot) => {
+        productsList = [];
+        snapshot.forEach((doc) => {
+          productsList.push({ id: doc.id, ...doc.data() });
+        });
+        
+        renderInventoryTable();
+      }, (err) => {
+        showToast("Database products subscription error", "error");
+      });
+    }
+
+    // Render inventory control display table
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventory-tbody');
+      
+      if (productsList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-gray-500">
+              <p class="text-xs font-semibold">No wardrobe stock found. Click create.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = productsList.map(p => {
+        const sizes = p.sizes || { S: 0, M: 0, L: 0, XL: 0 };
+        const tot = Object.values(sizes).reduce((a, b) => a + b, 0);
+        
+        let stockIndicator = '';
+        if (tot === 0) {
+          stockIndicator = '<span class="text-xs text-red-500 font-extrabold uppercase border border-red-500 px-2 py-0.5 rounded bg-red-50 select-none animate-pulse">Out Of Stock</span>';
+        } else if (tot < 15) {
+          stockIndicator = `<span class="text-xs text-amber-500 font-extrabold uppercase border border-amber-550 px-2 py-0.5 rounded bg-amber-50 select-none">Low Stock (${tot})</span>`;
+        } else {
+          stockIndicator = `<span class="text-xs text-green-600 font-extrabold uppercase border border-green-500 px-2 py-0.5 rounded bg-green-50 select-none">Optimal (${tot})</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50 transition border-b">
+            <!-- Product detail cell -->
+            <td class="py-4 px-6 flex items-center gap-3 max-w-sm">
+              <img src="${p.image}" alt="${p.title}" class="w-10 h-12 object-cover rounded shadow-sm bg-gray-100 flex-shrink-0" />
+              <div class="line-clamp-2 select-none">
+                <p class="font-bold text-gray-900 leading-snug">${p.title}</p>
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${p.colors ? p.colors.join(' • ') : 'Core'}</span>
+              </div>
+            </td>
+            <!-- Price Cell -->
+            <td class="py-4 px-3 font-mono font-black text-black">
+              $${p.price ? p.price.toFixed(2) : '19.99'}
+            </td>
+            <!-- Category cell -->
+            <td class="py-4 px-3">
+              <span class="bg-gray-100 text-stone-700 text-[10px] font-extrabold uppercase tracking-wide px-2 py-1 rounded">
+                ${p.category}
+              </span>
+            </td>
+            <!-- Stock Detail Cell -->
+            <td class="py-4 px-6 select-none">
+              <div class="flex items-center justify-center gap-4">
+                <div class="flex items-center gap-2.5 text-xs text-gray-400 font-bold uppercase tracking-wider">
+                  <span>S: <b class="${sizes.S === 0 ? 'text-red-500' : 'text-stone-900'}">${sizes.S}</b></span>
+                  <span>M: <b class="${sizes.M === 0 ? 'text-red-500' : 'text-stone-900'}">${sizes.M}</b></span>
+                  <span>L: <b class="${sizes.L === 0 ? 'text-red-500' : 'text-stone-900'}">${sizes.L}</b></span>
+                  <span>XL: <b class="${sizes.XL === 0 ? 'text-red-500' : 'text-stone-900'}">${sizes.XL}</b></span>
+                </div>
+                <div>${stockIndicator}</div>
+              </div>
+            </td>
+            <!-- Actions Cell -->
+            <td class="py-4 px-6 text-right">
+              <button onclick="editProductPrompt('${p.id}')" class="text-teal-600 hover:text-white hover:bg-teal-600 border border-teal-500 text-xs font-black uppercase px-3 py-1.5 rounded transition">
+                Modify <i class="fa-solid fa-pen-fancy ml-0.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Modal Edit Mode Hydrator
+    window.editProductPrompt = function(productId) {
+      const p = productsList.find(item => item.id === productId);
+      if (!p) return;
+
+      clearFormAndSetAction("edit");
+      
+      document.getElementById('edit-prod-id').value = p.id;
+      document.getElementById('prod-title').value = p.title;
+      document.getElementById('prod-category').value = p.category;
+      document.getElementById('prod-price').value = p.price;
+      document.getElementById('prod-image').value = p.image;
+      document.getElementById('prod-colors').value = p.colors ? p.colors.join(', ') : '';
+      document.getElementById('prod-description').value = p.description;
+
+      const sizes = p.sizes || { S: 0, M: 0, L: 0, XL: 0 };
+      document.getElementById('stock-s').value = sizes.S;
+      document.getElementById('stock-m').value = sizes.M;
+      document.getElementById('stock-l').value = sizes.L;
+      document.getElementById('stock-xl').value = sizes.XL;
+
+      document.getElementById('product-actions-modal').classList.remove('hidden');
+    }
+
+    function clearFormAndSetAction(type = "create") {
+      const form = document.getElementById('product-build-form');
+      form.reset();
+      document.getElementById('edit-prod-id').value = '';
+      
+      const delBtn = document.getElementById('delete-prod-btn');
+
+      if (type === "edit") {
+        document.getElementById('modal-action-title').innerText = "Modify Wardrobe Item";
+        delBtn.classList.remove('hidden');
+      } else {
+        document.getElementById('modal-action-title').innerText = "Create New Wardrobe Item";
+        delBtn.classList.add('hidden');
+        
+        // Reset default stocks
+        document.getElementById('stock-s').value = 10;
+        document.getElementById('stock-m').value = 15;
+        document.getElementById('stock-l').value = 10;
+        document.getElementById('stock-xl').value = 5;
+      }
+    }
+
+    // Product Add / Update Trigger Action Form submit
+    async function handleProductFormSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-prod-form-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Transmitting...";
+
+      const prodId = document.getElementById('edit-prod-id').value;
+      const title = document.getElementById('prod-title').value.trim();
+      const category = document.getElementById('prod-category').value;
+      const price = parseFloat(document.getElementById('prod-price').value);
+      const image = document.getElementById('prod-image').value.trim();
+      const description = document.getElementById('prod-description').value.trim();
+      
+      const colors = document.getElementById('prod-colors').value.split(',').map(c => c.trim()).filter(c => c.length > 0);
+
+      const sizes = {
+        S: parseInt(document.getElementById('stock-s').value) || 0,
+        M: parseInt(document.getElementById('stock-m').value) || 0,
+        L: parseInt(document.getElementById('stock-l').value) || 0,
+        XL: parseInt(document.getElementById('stock-xl').value) || 0
+      };
+
+      const payload = {
+        title,
+        category,
+        price,
+        image,
+        colors,
+        sizes,
+        description,
+        rating: 4.5, // preset defaults
+        reviewsCount: 15,
+        created_at: new Date()
+      };
+
+      try {
+        if (prodId) {
+          // Edit operation (Update existing doc)
+          const docRef = doc(db, "products", prodId);
+          await updateDoc(docRef, payload);
+          showToast("Product metadata changed comfortably!", "success");
+        } else {
+          // Create operation (Add new doc)
+          const collectionRef = collection(db, "products");
+          await addDoc(collectionRef, payload);
+          showToast("New product secured in database!", "success");
+        }
+        
+        document.getElementById('product-actions-modal').classList.add('hidden');
+      } catch (err) {
+        console.error("Database save error:", err);
+        showToast("Error processing inventory deposit request", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Save Inventory Deposit";
+      }
+    }
+
+    // Product Delete operation
+    async function handleProductDeleteAction() {
+      const prodId = document.getElementById('edit-prod-id').value;
+      if (!prodId) return;
+
+      if (!confirm("Caution: This will permanently wipe this clothing item catalog data. Continue?")) {
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "products", prodId);
+        await deleteDoc(docRef);
+        showToast("Clothing item deleted from record.", "warning");
+        document.getElementById('product-actions-modal').classList.add('hidden');
+      } catch (err) {
+        showToast("Delete database error occurred", "error");
+      }
+    }
+
+    // Stream live orders from firestore database
+    function streamRealtimeOrders() {
+      const ordersCol = collection(db, "orders");
+      const q = query(ordersCol, orderBy("created_at", "desc"));
+      
+      onSnapshot(q, (snapshot) => {
+        ordersList = [];
+        let revenueAccumulator = 0;
+        
+        snapshot.forEach((docSnap) => {
+          const item = docSnap.data();
+          ordersList.push({ id: docSnap.id, ...item });
+          if (item.status === 'completed' || item.status === 'shipped' || item.status === 'pending') {
+            revenueAccumulator += parseFloat(item.total || 0);
+          }
+        });
+
+        document.getElementById('gross-revenue-display').innerText = `$${revenueAccumulator.toFixed(2)}`;
+        document.getElementById('orders-count-indicator').innerText = `${ordersList.length} Orders Logged`;
+
+        renderAdminOrdersPanel();
+      }, (err) => {
+        console.error("Orders collection stream failure:", err);
+      });
+    }
+
+    // Render dispatcher orders lists inside column
+    function renderAdminOrdersPanel() {
+      const container = document.getElementById('admin-orders-container');
+      
+      if (ordersList.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center py-20 text-center text-gray-400">
+            <span class="text-3xl mb-3"><i class="fa-solid fa-folder-open"></i></span>
+            <p class="text-xs">No active order receipts recorded yet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = ordersList.map((order) => {
+        const dateStamp = order.created_at ? order.created_at.toDate().toLocaleDateString(undefined, {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Just now';
+        
+        const isPending = order.status === 'pending';
+        const isShipped = order.status === 'shipped';
+        const isCompleted = order.status === 'completed';
+        const isCancelled = order.status === 'cancelled';
+
+        let actionControls = '';
+        if (isPending) {
+          actionControls = `
+            <div class="flex gap-2">
+              <button onclick="commitOrderStatus('${order.id}', 'shipped')" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase py-2 rounded shadow-sm transition">Dispatch Shipment</button>
+              <button onclick="commitOrderStatus('${order.id}', 'cancelled')" class="border text-red-500 hover:bg-red-50 text-[10px] font-bold px-2.5 rounded transition">Cancel</button>
+            </div>
+          `;
+        } else if (isShipped) {
+          actionControls = `
+            <button onclick="commitOrderStatus('${order.id}', 'completed')" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-[10px] font-black uppercase py-2 rounded transition">Log Arrived Deliveries</button>
+          `;
+        } else {
+          actionControls = `<div class="text-center text-[10px] text-gray-400 font-extrabold uppercase py-1 border border-dashed rounded bg-gray-50 border-gray-100">Closed Operations Terminal</div>`;
+        }
+
+        const itemsString = order.items.map(i => `<span class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">${i.title} (${i.size} - ${i.quantity}x)</span>`).join(' ');
+
+        return `
+          <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl shadow-sm space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-black text-stone-900 leading-none">${order.customerName}</p>
+                <a href="mailto:${order.customerEmail}" class="text-[10px] text-teal-600 hover:underline mt-0.5 block">${order.customerEmail}</a>
+              </div>
+              <span class="text-xs font-bold font-mono text-rose-500 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">$${order.total ? order.total.toFixed(2) : '19.99'}</span>
+            </div>
+
+            <!-- Items -->
+            <div class="text-[10px] font-bold uppercase tracking-wider flex flex-wrap gap-1">
+              ${itemsString}
+            </div>
+
+            <!-- Address and times info -->
+            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wide flex justify-between select-none border-t pt-2">
+              <span>City: ${order.city || 'Berlin'}</span>
+              <span>Time: ${dateStamp}</span>
+            </div>
+
+            <!-- Action changes -->
+            <div class="pt-1.5">${actionControls}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Set order status mutation inside firestore
+    window.commitOrderStatus = async function(orderId, nextStatus) {
+      if (!confirm(`Verify: Change operational processing condition on order #${orderId.slice(0,6)} to (${nextStatus})?`)) {
+        return;
+      }
+      
+      try {
+        const orderDocRef = doc(db, "orders", orderId);
+        await updateDoc(orderDocRef, { status: nextStatus });
+        showToast("Order transaction dispatch changed comfortably!", "success");
+      } catch (err) {
+        showToast("Staff dispatcher modification request broken", "error");
+      }
+    }
+
+    // Toast logic helpers
+    window.showToast = function(message, type = "success") {
+      const parent = document.getElementById('toast-wrapper');
+      
+      const el = document.createElement('div');
+      el.className = `p-4 rounded-xl border shadow-lg flex items-center gap-3 bg-white text-xs font-medium cursor-pointer translate-y-4 opacity-0 transition duration-300 pointer-events-auto z-50`;
+      
+      let icon = '';
+      if (type === 'success') {
+        el.classList.add('border-green-100', 'text-green-800');
+        icon = '<i class="fa-solid fa-circle-check text-green-500 text-base"></i>';
+      } else if (type === 'error') {
+        el.classList.add('border-red-100', 'text-rose-800');
+        icon = '<i class="fa-solid fa-circle-exclamation text-rose-500 text-base"></i>';
+      } else if (type === 'warning') {
+        el.classList.add('border-yellow-105', 'text-yellow-800');
+        icon = '<i class="fa-solid fa-circle-info text-yellow-500 text-base"></i>';
+      } else {
+        el.classList.add('border-stone-100', 'text-stone-800');
+        icon = '<i class="fa-solid fa-info text-stone-500 text-base"></i>';
+      }
+
+      el.innerHTML = `${icon} <span class="flex-grow">${message}</span>`;
+      
+      // Auto click-dismiss toast option
+      el.onclick = () => {
+        el.classList.add('opacity-0', 'translate-x-[200px]');
+        setTimeout(() => el.remove(), 300);
+      };
+
+      parent.appendChild(el);
+      
+      // Animation frames
+      setTimeout(() => {
+        el.classList.remove('opacity-0', 'translate-y-4');
+      }, 10);
+
+      // Auto dismiss timeout
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.classList.add('opacity-0', 'translate-y-4');
+          setTimeout(() => el.remove(), 300);
+        }
+      }, 4000);
+    }
+
+  </script>
+</body>
+</html>
+
